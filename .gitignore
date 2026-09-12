@@ -2,6 +2,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 *.log
+reports/
 probe/out.txt
 probe/err.txt
 probe/repro_out.txt
