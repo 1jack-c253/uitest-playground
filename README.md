@@ -1,6 +1,11 @@
 # UI Test Automation Playground 自动化测试
 
+[![UI Tests](https://github.com/1jack-c253/uitest-playground/actions/workflows/ui-tests.yml/badge.svg)](https://github.com/1jack-c253/uitest-playground/actions/workflows/ui-tests.yml)
+
 对公开练习靶场 [uitestingplayground.com](http://uitestingplayground.com) 中 **6 个「抗自动化」场景**做测试设计与执行。
+
+测试套件由 **GitHub Actions 持续集成**：每次 push / PR 自动在 Ubuntu 环境安装
+Playwright 并执行全部用例，构建产物包含 junit 测试报告。
 
 这个靶场把真实项目里最难自动化的场景单独做成了页面 —— 动态元素、异步长延迟、防脚本点击、事件依赖等。
 本项目对其中 6 个场景做了完整测试，并记录了每一个自动化难题的**定位过程与解决方式**。
@@ -130,6 +135,26 @@ pip install -r requirements.txt
 playwright install chromium
 ```
 
+### 运行测试套件（9 条用例）
+
+```bash
+pytest tests/ -v
+```
+
+本地实测：`9 passed in 60.94s`（headless 模式）
+
+| 用例 | 验证点 |
+|---|---|
+| `test_dynamic_id_changes_on_reload` | 刷新后 id 变化，class / 文本稳定可作定位依据 |
+| `test_click_synthetic_event_is_ignored` | JS 合成 click 被过滤（screenX = 0） |
+| `test_click_real_mouse_event_works` | 带真实屏幕坐标的鼠标事件生效 |
+| `test_click_judgement_is_screenx_not_istrusted` | 铁证：纯合成事件仅填 screenX 即可绕过 |
+| `test_text_input_requires_both_events` | 只触发 input 不触发 change → 按钮不更新 |
+| `test_text_input_normal_flow_updates` | 完整输入流程 → 按钮正常更新 |
+| `test_ajax_long_delay_and_result_accumulation` | 显式轮询等待 + 结果累积缺陷验证 |
+| `test_progress_bar_stop_and_result_formula` | 浏览器内轮询精确停止 + `Result = 停止值 − 75` |
+| `test_progress_bar_reads_aria_valuenow` | 应读 aria 属性而非解析展示文本 |
+
 ### 交互式走查（6 个场景，逐个暂停讲解）
 
 ```bash
@@ -163,6 +188,7 @@ python probe/shots.py                # 批量生成带标注的截图
 ```
 .
 ├── walkthrough.py           # 交互式走查脚本（6 站）
+├── tests/                   # pytest 测试套件（9 条用例，CI 自动执行）
 ├── screenshots/             # 14 张带标注的现场截图
 └── probe/
     ├── recon.py             # 页面 DOM 结构侦察，获取准确选择器
